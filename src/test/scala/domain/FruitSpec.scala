@@ -2,12 +2,11 @@ package domain
 
 import domain.FruitSpec.*
 import org.scalacheck.Gen
-import org.scalatest.EitherValues
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
-final class FruitSpec extends AnyFunSpec with ScalaCheckPropertyChecks with Matchers with EitherValues {
+final class FruitSpec extends AnyFunSpec with ScalaCheckPropertyChecks with Matchers {
   describe("fruit success") {
     it("should take an Apple string and return its ADT encoding") {
       forAll(validAppleFruitString){ string =>
@@ -21,9 +20,9 @@ final class FruitSpec extends AnyFunSpec with ScalaCheckPropertyChecks with Matc
     }
   }
   describe("fruit failure") {
-    it("should take an Apple string and return its ADT encoding") {
+    it("should take return an error when passed an unsupported string") {
       forAll(invalidFruitString) { string =>
-        val failureString = s"Invalid argument. [$string] is not a supported Fruit"
+        val failureString = s"Invalid argument [$string] is not a supported Fruit"
         Fruit.fromString(string) should ===(Left(failureString))
       }
     }

@@ -1,11 +1,11 @@
 package checkout
 
-import org.scalatest.EitherValues
+import org.scalatest.Checkpoints.Checkpoint
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
-final class CheckoutSpec extends AnyFunSpec with ScalaCheckPropertyChecks with Matchers with EitherValues {
+final class CheckoutSpec extends AnyFunSpec with ScalaCheckPropertyChecks with Matchers {
   describe("checkout computeCost success") {
     it("should take an empty list and return a cost of 0p") {
       val input = List.empty[String]
@@ -25,7 +25,30 @@ final class CheckoutSpec extends AnyFunSpec with ScalaCheckPropertyChecks with M
     }
     it("should calculate the total cost when provided a valid list of more than one strings 2") {
       val input = List("orange", "apple", "apple", "apple")
-      Checkout.computeCost(input) should ===(2.05)
+      Checkout.computeCost(input) should ===(1.45)
+    }
+    it("should return price for buy one get one free apples") {
+      val cp = new Checkpoint
+      cp {
+        Checkout.computeCost(List("apple", "apple", "apple", "apple")) should ===(1.20)
+      }
+      cp {
+        Checkout.computeCost(List("apple", "apple", "apple")) should ===(1.20)
+      }
+      cp.reportAll()
+    }
+    it("should return price for three for the price of two oranges") {
+      val cp = new Checkpoint
+      cp {
+        Checkout.computeCost(List("orange", "orange", "orange")) should ===(0.5)
+      }
+      cp {
+        Checkout.computeCost(List("orange", "orange", "orange", "orange", "orange", "orange")) should ===(1.0)
+      }
+      cp {
+        Checkout.computeCost(List("orange", "orange", "orange", "orange", "orange")) should ===(1.0)
+      }
+      cp.reportAll()
     }
   }
 

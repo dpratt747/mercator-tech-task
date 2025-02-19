@@ -1,20 +1,21 @@
 package domain
 
-sealed abstract class Fruit extends Product with Serializable {
-  def cost: Double
+sealed abstract class Fruit(val stringRepr: String, val cost: BigDecimal) extends Product with Serializable
+
+case object Apple extends Fruit("Apple", 0.60) {
+  def unapply(string: String): Option[Apple.type] =
+    Option.when(string.toLowerCase == stringRepr.toLowerCase)(Apple)
 }
-case object Apple extends Fruit {
-  override def cost: Double = 0.60
-}
-case object Orange extends Fruit {
-  override def cost: Double = 0.25
+
+case object Orange extends Fruit("Orange", 0.25) {
+  def unapply(string: String): Option[Orange.type] =
+    Option.when(string.toLowerCase == stringRepr.toLowerCase)(Orange)
 }
 
 object Fruit {
-  def fromString(str: String): Either[String, Fruit] = {
-    str.toLowerCase match
-      case "apple" => Right(Apple)
-      case "orange" => Right(Orange)
-      case _ => Left(s"Invalid argument. [$str] is not a supported Fruit")
+  def fromString: String => Either[String, Fruit] = {
+    case Apple(fruit) => Right(fruit)
+    case Orange(fruit) => Right(fruit)
+    case str => Left(s"Invalid argument [$str] is not a supported Fruit")
   }
 }

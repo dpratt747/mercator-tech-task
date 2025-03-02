@@ -37,6 +37,33 @@ final class CheckoutSpec extends AnyFunSpec with ScalaCheckPropertyChecks with M
       }
       cp.reportAll()
     }
+    it("should return price for buy one get one free bananas") {
+      val cp = new Checkpoint
+      cp {
+        Checkout.computeCost(List("banana", "banana", "banana", "banana")) should ===(0.40)
+      }
+      cp {
+        Checkout.computeCost(List("banana", "banana", "banana")) should ===(0.40)
+      }
+      cp.reportAll()
+    }
+    it("should ignore the cheapest one when a banana is bought together with an apple") {
+      val cp = new Checkpoint
+      cp {
+        // banana is ignored as the apple is more expensive
+        Checkout.computeCost(List("banana", "apple")) should ===(0.60)
+      }
+      cp {
+        Checkout.computeCost(List("banana", "banana", "apple")) should ===(0.80)
+      }
+      cp {
+        Checkout.computeCost(List("banana", "banana", "banana", "banana", "apple")) should ===(1.00)
+      }
+      cp {
+        Checkout.computeCost(List("banana", "banana", "banana", "banana")) should ===(0.40)
+      }
+      cp.reportAll()
+    }
     it("should return price for three for the price of two oranges") {
       val cp = new Checkpoint
       cp {
